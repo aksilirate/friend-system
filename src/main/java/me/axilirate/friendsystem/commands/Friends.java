@@ -1,6 +1,8 @@
 package me.axilirate.friendsystem.commands;
 
 import me.axilirate.friendsystem.FriendSystem;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,10 +31,15 @@ public class Friends implements CommandExecutor {
             }
 
             if (args.length == 2){
+
                 if (args[0].equals("add")){
+                    String argsPlayerName = args[1];
+                    Player argsPlayer =  Bukkit.getPlayer(argsPlayerName);
+                    if (argsPlayer != null){
 
-
-
+                    }else{
+                        player.sendMessage(ChatColor.GRAY + "The player is not online");
+                    }
 
                 }
 
