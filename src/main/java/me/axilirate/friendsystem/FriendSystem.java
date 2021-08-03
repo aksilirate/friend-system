@@ -1,6 +1,7 @@
 package me.axilirate.friendsystem;
 
 import me.axilirate.friendsystem.commands.Friends;
+import me.axilirate.friendsystem.items.AddFriend;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
@@ -14,7 +15,7 @@ public final class FriendSystem extends JavaPlugin {
 
 
     public Inventory friendsInventory = Bukkit.createInventory(null, 54, "Friends");
-
+    public AddFriend addFriend = new AddFriend();
 
     @Override
     public void onEnable() {
@@ -39,6 +40,14 @@ public final class FriendSystem extends JavaPlugin {
         eco = eco_rsp.getProvider();
 
         this.getCommand("friends").setExecutor(new Friends(this));
+
+
+
+        friendsInventory.setItem(45, addFriend.getItem());
+
+
+
+
 
 
     }

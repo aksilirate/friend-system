@@ -24,8 +24,19 @@ public class Friends implements CommandExecutor {
             Player player = (Player) sender;
             String playerUID = player.getUniqueId().toString();
 
+            if (args.length == 0){
+                player.openInventory(friendSystem.friendsInventory);
+            }
 
-            player.openInventory(friendSystem.friendsInventory);
+            if (args.length == 2){
+                if (args[0].equals("add")){
+
+
+
+
+                }
+
+            }
 
 
         }
