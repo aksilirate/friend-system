@@ -2,3 +2,4 @@ name: FriendSystem
 version: ${project.version}
 main: me.axilirate.friendsystem.FriendSystem
 api-version: 1.17
+depends: [Vault]
