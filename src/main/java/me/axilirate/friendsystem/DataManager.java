@@ -4,49 +4,86 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 public class DataManager {
 
-    public FriendSystem friendSystem;
+    final public FriendSystem friendSystem;
 
     public DataManager(FriendSystem friendSystem) {
         this.friendSystem = friendSystem;
     }
 
 
-
-    public void setYamlFriendTimeStamp(String playerUID, String friendUID, Double TimeStamp) {
-        File file = new File(friendSystem.getDataFolder(), "/player-data/" + playerUID + ".yml");
+    public void setYamlFriend(String playerUID, String friendUID, Boolean areFriends) {
+        File file = new File(friendSystem.getDataFolder() + "/player-data", playerUID + ".yml");
         YamlConfiguration yaml_file = YamlConfiguration.loadConfiguration(file);
-
-        yaml_file.set("friends." + friendUID, TimeStamp);
+        yaml_file.set("friends." + friendUID + ".are-friends", areFriends);
 
         saveYamlFile(file, yaml_file);
     }
 
 
-
-    public Set<String> getYamlFriends(String playerUID){
-        File file = new File(friendSystem.getDataFolder(), "/player-data/" + playerUID + ".yml");
+    public boolean getYamlFriend(String playerUID, String friendUID) {
+        File file = new File(friendSystem.getDataFolder() + "/player-data", playerUID + ".yml");
         YamlConfiguration yaml_file = YamlConfiguration.loadConfiguration(file);
 
-        return yaml_file.getKeys(false);
+        if (yaml_file.get("friends." + friendUID + ".are-friends") == null) {
+            return false;
+        }
+
+        return (boolean) yaml_file.get("friends." + friendUID + ".are-friends");
     }
 
 
-
-    public Double getYamlFriendTimeStamp(String playerUID, String friendUID) {
-        File file = new File(friendSystem.getDataFolder(), "/player-data/" + playerUID + ".yml");
+    public void setYamlFriendGiftTime(String playerUID, String friendUID, Long time) {
+        File file = new File(friendSystem.getDataFolder() + "/player-data", playerUID + ".yml");
         YamlConfiguration yaml_file = YamlConfiguration.loadConfiguration(file);
 
-        return (Double) yaml_file.get("friends." + friendUID);
+        yaml_file.set("friends." + friendUID + ".gift-time", time);
+
+        saveYamlFile(file, yaml_file);
+    }
+
+
+    public Set<String> getYamlFriends(String playerUID) {
+        File file = new File(friendSystem.getDataFolder() + "/player-data", playerUID + ".yml");
+        YamlConfiguration yaml_file = YamlConfiguration.loadConfiguration(file);
+
+        if (yaml_file.getConfigurationSection("friends") != null) {
+
+            Set<String> friends = yaml_file.getConfigurationSection("friends").getKeys(false);
+
+            for (String friend : friends) {
+                if (!getYamlFriend(playerUID, friend)) {
+                    friends.remove(friend);
+                }
+
+            }
+
+            return friends;
+
+        } else {
+            return new HashSet<>();
+        }
+
 
     }
 
 
+    public long getYamlFriendGiftTime(String playerUID, String friendUID) {
+        File file = new File(friendSystem.getDataFolder() + "/player-data", playerUID + ".yml");
+        YamlConfiguration yaml_file = YamlConfiguration.loadConfiguration(file);
 
+        if (yaml_file.get("friends." + friendUID + ".gift-time") == null) {
+            return 0;
+        }
+
+
+        return (long) yaml_file.get("friends." + friendUID + ".gift-time");
+
+    }
 
 
     public void saveYamlFile(File file, YamlConfiguration yaml_file) {
