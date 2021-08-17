@@ -66,7 +66,7 @@ public class Friends implements CommandExecutor {
 
                 if (args[0].equals("add")){
 
-                    if (argsPlayer.equals(player.getName())){
+                    if (argsPlayer.getName().equals(player.getName())){
                         player.sendMessage(ChatColor.RED + "You cannot add yourself as a friend");
                         return true;
                     }
