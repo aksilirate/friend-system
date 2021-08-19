@@ -33,7 +33,7 @@ public class DataManager {
             return false;
         }
 
-        return (boolean) yaml_file.get("friends." + friendUID + ".are-friends");
+        return yaml_file.getBoolean("friends." + friendUID + ".are-friends");
     }
 
 
@@ -55,12 +55,7 @@ public class DataManager {
 
             Set<String> friends = yaml_file.getConfigurationSection("friends").getKeys(false);
 
-            for (String friend : friends) {
-                if (!getYamlFriend(playerUID, friend)) {
-                    friends.remove(friend);
-                }
-
-            }
+            friends.removeIf(friend -> !getYamlFriend(playerUID, friend));
 
             return friends;
 
@@ -81,7 +76,7 @@ public class DataManager {
         }
 
 
-        return (long) yaml_file.get("friends." + friendUID + ".gift-time");
+        return yaml_file.getLong("friends." + friendUID + ".gift-time");
 
     }
 
