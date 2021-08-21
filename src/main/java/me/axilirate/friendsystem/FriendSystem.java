@@ -51,8 +51,9 @@ public final class FriendSystem extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EventListener(this), this);
 
 
-
-        this.getCommand("friends").setExecutor(new Friends(this));
+        Friends friends = new Friends(this);
+        this.getCommand("friends").setExecutor(friends);
+        this.getCommand("friends").setTabCompleter(friends);
 
 
 

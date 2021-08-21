@@ -13,16 +13,13 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
-public class Friends implements CommandExecutor {
+public class Friends implements CommandExecutor, TabCompleter {
 
 
     public FriendSystem friendSystem;
@@ -31,8 +28,8 @@ public class Friends implements CommandExecutor {
         this.friendSystem = friendSystem;
     }
 
-// 1. user      2.friend request
-    HashMap<Player, ArrayList<Player>> friendRequests =  new HashMap<>();
+    // 1. user      2.friend request
+    HashMap<Player, ArrayList<Player>> friendRequests = new HashMap<>();
 
 
     @Override
@@ -43,7 +40,7 @@ public class Friends implements CommandExecutor {
             Player player = (Player) sender;
             String playerUID = player.getUniqueId().toString();
 
-            if (args.length == 0){
+            if (args.length == 0) {
 
                 Inventory updatedFriendsInventory = friendSystem.getUpdatedFriendsInventory(player);
 
@@ -53,20 +50,18 @@ public class Friends implements CommandExecutor {
             }
 
 
-            if (args.length == 2){
+            if (args.length == 2) {
                 String argsPlayerName = args[1];
-                Player argsPlayer =  Bukkit.getPlayer(argsPlayerName);
-                if (argsPlayer == null){
+                Player argsPlayer = Bukkit.getPlayer(argsPlayerName);
+                if (argsPlayer == null) {
                     player.sendMessage(ChatColor.RED + "Player is not found.");
                     return true;
                 }
 
 
+                if (args[0].equals("add")) {
 
-
-                if (args[0].equals("add")){
-
-                    if (argsPlayer.getName().equals(player.getName())){
+                    if (argsPlayer.getName().equals(player.getName())) {
                         player.sendMessage(ChatColor.RED + "You cannot add yourself as a friend");
                         return true;
                     }
@@ -75,17 +70,17 @@ public class Friends implements CommandExecutor {
                     Set<String> friendsStrings = friendSystem.dataManager.getYamlFriends(playerUID);
 
 
-                    if (!friendsStrings.isEmpty()){
+                    if (!friendsStrings.isEmpty()) {
                         ArrayList<Player> friends = new ArrayList<>();
-                        for (String friendUID: friendsStrings){
+                        for (String friendUID : friendsStrings) {
                             Player friendPlayer = Bukkit.getPlayer(UUID.fromString(friendUID));
-                            if (friendPlayer != null){
+                            if (friendPlayer != null) {
                                 friends.add(friendPlayer);
                             }
                         }
 
 
-                        if (friends.contains(argsPlayer)){
+                        if (friends.contains(argsPlayer)) {
                             player.sendMessage(ChatColor.RED + argsPlayer.getDisplayName() + " is already your friend.");
                             return true;
                         }
@@ -95,7 +90,7 @@ public class Friends implements CommandExecutor {
 
                     ArrayList<Player> activeRequests = friendRequests.get(argsPlayer);
 
-                    if (activeRequests == null){
+                    if (activeRequests == null) {
                         activeRequests = new ArrayList<>();
                     }
 
@@ -113,7 +108,7 @@ public class Friends implements CommandExecutor {
                     TextComponent declineMsg = new TextComponent("Decline");
                     declineMsg.setColor(ChatColor.RED);
                     declineMsg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(ChatColor.RED + "decline the friend request")));
-                    declineMsg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,  "/friends decline " + player.getName()));
+                    declineMsg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/friends decline " + player.getName()));
 
 
                     TextComponent msg0 = new TextComponent(player.getDisplayName() + " has sent you a friend request [");
@@ -132,22 +127,21 @@ public class Friends implements CommandExecutor {
                     message.addExtra(msg2);
 
                     argsPlayer.spigot().sendMessage(message);
-
+                    player.sendMessage(ChatColor.GRAY + "You've sent a friend request to " + argsPlayer.getDisplayName());
 
                 }
 
 
-
-                if (args[0].equals("accept")){
+                if (args[0].equals("accept")) {
                     ArrayList<Player> activeRequests = friendRequests.get(player);
 
-                    if (activeRequests == null){
+                    if (activeRequests == null) {
                         activeRequests = new ArrayList<>();
                         player.sendMessage(ChatColor.RED + "You have no active requests");
                         return true;
                     }
 
-                    if (activeRequests.contains(argsPlayer)){
+                    if (activeRequests.contains(argsPlayer)) {
                         String friendUID = argsPlayer.getUniqueId().toString();
 
                         friendSystem.dataManager.setYamlFriend(playerUID, friendUID, true);
@@ -160,20 +154,16 @@ public class Friends implements CommandExecutor {
                         argsPlayer.sendMessage(ChatColor.GREEN + player.getDisplayName() + " has accepted your friend request");
                     }
 
-                }
-
-
-
-                else if (args[0].equals("decline")){
+                } else if (args[0].equals("decline")) {
                     ArrayList<Player> activeRequests = friendRequests.get(player);
 
-                    if (activeRequests == null){
+                    if (activeRequests == null) {
                         activeRequests = new ArrayList<>();
                         player.sendMessage(ChatColor.RED + "You have no active requests");
                         return true;
                     }
 
-                    if (activeRequests.contains(argsPlayer)){
+                    if (activeRequests.contains(argsPlayer)) {
                         activeRequests.remove(argsPlayer);
                         friendRequests.put(argsPlayer, activeRequests);
                         argsPlayer.sendMessage(ChatColor.RED + player.getDisplayName() + " has declined your friend request");
@@ -181,10 +171,7 @@ public class Friends implements CommandExecutor {
                     }
 
 
-
                 }
-
-
 
 
             }
@@ -196,5 +183,22 @@ public class Friends implements CommandExecutor {
         return true;
     }
 
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
+        List<String> results = new ArrayList<>();
+
+        if (args.length == 1) {
+            results.add("add");
+        }
+
+        if (args.length == 2) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                results.add(player.getName());
+            }
+        }
+
+        return results;
+    }
 
 }
